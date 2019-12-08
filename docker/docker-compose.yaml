@@ -1,0 +1,9 @@
+version: '3.6'
+services:
+  maxscale:
+    image: mariadb/maxscale:latest
+    volumes:
+        - ./maxscale.cnf.d/my-maxscale.cnf:/etc/maxscale.cnf.d/my-maxscale.cnf
+    ports:
+        - 4008:4008
+        - 4006:4006

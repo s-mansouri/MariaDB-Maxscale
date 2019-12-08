@@ -1,0 +1,60 @@
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: maxscale-exporter
+  namespace: monitoring
+  labels:
+    run: maxscale-exporter
+    kind: deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: maxscale-exporter
+    spec:
+      containers:
+      - name: maxscale-exporter
+        image: maxscale-exporter:3.8
+        ports:
+          - containerPort: 9195
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: maxscale-exporter
+  namespace: monitoring
+  labels:
+    run: maxscale-exporter
+    kind: service
+spec:
+  ports:
+    - name: maxscale-exporter
+      port: 9195
+      targetPort: 9195
+      protocol: TCP
+  selector:
+    run: maxscale-exporter
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: maxscale-monitor
+    kind: servicemonitor
+  name: maxscale-monitor
+  namespace: monitoring
+spec:
+  endpoints:
+  - port: maxscale-exporter
+    interval: 30s
+  jobLabel: k8s-app
+  namespaceSelector:
+    matchNames:
+    - monitoring
+  selector:
+    matchLabels:
+     run: maxscale-exporter
